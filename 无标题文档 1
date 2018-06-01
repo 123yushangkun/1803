@@ -1,0 +1,69 @@
+案例1：部署LNMP环境(linux\nginx\mysql\php
+)
+安装部署Nginx、MariaDB、PHP环境
+安装部署Nginx、MariaDB、PHP、PHP-FPM；
+启动Nginx、MariaDB、FPM服务；
+并测试LNMP是否工作正常。
+步骤一：安装软件
+    [root@proxy ~]# yum -y install gcc openssl-devel pcre-devel zlib-devel
+
+源码安装Nginx（如果前面课程中已经安装Nginx，则忽略这一步）
+
+    [root@proxy ~]# useradd -s /sbin/nologin  nginx
+    [root@proxy ~]# tar -xvf nginx-1.12.2.tar.gz
+    [root@proxy ~]# cd nginx-1.12.2
+    [root@proxy nginx-1.12.2]# ./configure   \
+    > --user=nginx   --group=nginx \
+    > --with-http_ssl_module
+    [root@proxy ~]# make && make install
+）安装MariaDB
+
+Mariadb在新版RHEL7光盘中包含有该软件，配置yum源后可以直接使用yum安装：
+
+    [root@proxy ~]# yum -y install   mariadb   mariadb-server   mariadb-devel
+
+php和php-fpm(该软件包在lnmp_soft中提供)
+[root@proxy ~]# cd lnmp_soft/
+[root@proxy ~]# ls php-fpm-5.4.16-42.el7.x86_64.rpm
+[root@proxy ~]# yum -y  install  php   php-mysql
+[root@proxy ~]# yum -y  install php-fpm-5.4.16-42.el7.x86_64.rpm
+
+启动服务
+1）启动Nginx服务（如果已经启动nginx，则可以忽略这一步）
+    [root@proxy ~]# systemctl stop httpd                //如果该服务存在则关闭该服务
+    [root@proxy ~]# /usr/local/nginx/sbin/nginx             //启动Nginx服务
+    [root@proxy ~]# netstat -utnlp | grep :80
+    tcp    0    0 0.0.0.0:80        0.0.0.0:*        LISTEN        32428/nginx         
+2）启动MySQL服务
+    [root@proxy ~]# systemctl start  mariadb           //启动服务器
+    [root@proxy ~]# systemctl status mariadb           //查看服务状态
+    [root@proxy ~]# systemctl enable mariadb           //设置开机启动
+3)启动PHP-FPM服务
+    [root@proxy ~]# systemctl start php-fpm           //启动服务
+    [root@proxy ~]# systemctl status php-fpm          //查看服务状态
+    [root@proxy ~]# systemctl enable php-fpm          //设置开机启动
+4)设置防火墙与SELinux
+    [root@proxy ~]# firewall-cmd --set-default-zone=trusted
+    [root@proxy ~]# setenforce 0
+
+charset utf-8;万国编码
+
+
+
+案例2：构建LNMP平台
+方案
+
+使用2台RHEL7虚拟机，其中一台作为LNMP服务器（192.168.4.5）、另外一台作为测试用的Linux客户机（192.168.4.100），如图-1所示。
+
+步骤一： php-fpm配置文件
+1）查看php-fpm配置文件（实验中不需要修改该文件）
+
+    [root@proxy etc]# vim /etc/php-fpm.d/www.conf
+    [www]
+    listen = 127.0.0.1:9000            //PHP端口号
+    pm.max_children = 32                //最大进程数量
+    pm.start_servers = 15                //最小进程数量
+    pm.min_spare_servers = 5            //最少需要几个空闲着的进程
+    pm.max_spare_servers = 32            //最多允许几个进程处于空闲状态
+
+
