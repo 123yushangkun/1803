@@ -4,7 +4,7 @@
 安装部署Nginx、MariaDB、PHP、PHP-FPM；
 启动Nginx、MariaDB、FPM服务；
 并测试LNMP是否工作正常。
-步骤一：安装软件
+步骤一：安装软件xxxxxxxxxxxxxxxxxx
     [root@proxy ~]# yum -y install gcc openssl-devel pcre-devel zlib-devel
 
 源码安装Nginx（如果前面课程中已经安装Nginx，则忽略这一步）
